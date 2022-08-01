@@ -12,15 +12,26 @@ import (
 )
 
 const (
-	getCompaniesSQL   = "SELECT co.id, co.name, c.name, co.website, co.country_code, co.number, co.created_at, co.updated_at FROM companies co JOIN company_countries cc ON cc.company_id = comp.id JOIN countries c ON c.id = cc.country_id"
-	getCompanyByIDSQL = getCompaniesSQL + " WHERE id = $1"
-	saveCompanySQL    = "INSERT INTO companies (name, created_at, updated_at) VALUES ($1, $2, $3)"
-	updateCompanySQL  = "UPDATE companies SET name = $1, website = $2, country_code = $3, number = $4, updated_at = $5 WHERE id = $6"
+	deleteCompanySQL           = "DELETE FROM companies WHERE id = $1"
+	getCompaniesSQL            = "SELECT co.id, co.name, co.code c.name, co.website, co.country_code, co.number, co.created_at, co.updated_at FROM companies co JOIN company_countries cc ON cc.company_id = comp.id JOIN countries c ON c.id = cc.country_id"
+	getCompanyByCodeSQL        = getCompaniesSQL + " WHERE co.code = $1"
+	getCompanyByIDSQL          = getCompaniesSQL + " WHERE co.id = $1"
+	getCompanyByNameSQL        = getCompaniesSQL + " WHERE co.name = $1"
+	getCompanyByPhoneNumberSQL = getCompaniesSQL + " WHERE co.country_code = $1 AND co.number = $2"
+	getCompanyByWebsiteSQL     = getCompaniesSQL + " WHERE co.website = $1"
+	saveCompanySQL             = "INSERT INTO companies (name, created_at, updated_at) VALUES ($1, $2, $3)"
+	updateCompanySQL           = "UPDATE companies SET name = $1, website = $2, country_code = $3, number = $4, updated_at = $5 WHERE id = $6"
 )
 
 type (
 	CompanyRepository interface {
+		CompanyByCode(ctx context.Context, operations db.SQLOperations, code string) (*entities.Company, error)
 		CompanyByID(ctx context.Context, operations db.SQLOperations, companyID int64) (*entities.Company, error)
+		CompanyByName(ctx context.Context, operations db.SQLOperations, companyName string) (*entities.Company, error)
+		CompanyByPhoneNumber(ctx context.Context, operations db.SQLOperations, phoneNumber entities.PhoneNumber) (*entities.Company, error)
+		CompanyByWebsite(ctx context.Context, operations db.SQLOperations, website string) (*entities.Company, error)
+		CompanyCount(ctx context.Context, operations db.SQLOperations, filter *forms.Filter) (int, error)
+		DeleteCompany(ctx context.Context, operations db.SQLOperations, companyID int64) error
 		ListCompanies(ctx context.Context, operations db.SQLOperations, filter *forms.Filter) ([]*entities.Company, error)
 		Save(ctx context.Context, operations db.SQLOperations, company *entities.Company) error
 	}
@@ -30,6 +41,21 @@ type (
 
 func NewCompanyRepository() *AppCompanyRepository {
 	return &AppCompanyRepository{}
+}
+
+func (r *AppCompanyRepository) CompanyByCode(
+	ctx context.Context,
+	operations db.SQLOperations,
+	code string,
+) (*entities.Company, error) {
+
+	row := operations.QueryRowContext(
+		ctx,
+		getCompanyByCodeSQL,
+		code,
+	)
+
+	return r.scanRow(row)
 }
 
 func (r *AppCompanyRepository) CompanyByID(
@@ -45,6 +71,98 @@ func (r *AppCompanyRepository) CompanyByID(
 	)
 
 	return r.scanRow(row)
+}
+
+func (r *AppCompanyRepository) CompanyByName(
+	ctx context.Context,
+	operations db.SQLOperations,
+	companyName string,
+) (*entities.Company, error) {
+
+	row := operations.QueryRowContext(
+		ctx,
+		getCompanyByNameSQL,
+		companyName,
+	)
+
+	return r.scanRow(row)
+}
+
+func (r *AppCompanyRepository) CompanyByPhoneNumber(
+	ctx context.Context,
+	operations db.SQLOperations,
+	phoneNumber entities.PhoneNumber,
+) (*entities.Company, error) {
+
+	row := operations.QueryRowContext(
+		ctx,
+		getCompanyByPhoneNumberSQL,
+		phoneNumber.CountryCode,
+		phoneNumber.Number,
+	)
+
+	return r.scanRow(row)
+}
+
+func (r *AppCompanyRepository) CompanyByWebsite(
+	ctx context.Context,
+	operations db.SQLOperations,
+	website string,
+) (*entities.Company, error) {
+
+	row := operations.QueryRowContext(
+		ctx,
+		getCompanyByWebsiteSQL,
+		website,
+	)
+
+	return r.scanRow(row)
+}
+
+func (r *AppCompanyRepository) CompanyCount(
+	ctx context.Context,
+	operations db.SQLOperations,
+	filter *forms.Filter,
+) (int, error) {
+
+	var count int
+
+	query, args := r.buildQuery(getCompaniesSQL, filter.NoPagination())
+
+	err := operations.QueryRowContext(
+		ctx,
+		query,
+		args...,
+	).Scan(&count)
+	if err != nil {
+		return 0, utils.NewError(
+			err,
+			"company count query row error",
+		)
+	}
+
+	return count, nil
+}
+
+func (r *AppCompanyRepository) DeleteCompany(
+	ctx context.Context,
+	operations db.SQLOperations,
+	companyID int64,
+) error {
+
+	_, err := operations.ExecContext(
+		ctx,
+		deleteCompanySQL,
+		companyID,
+	)
+	if err != nil {
+		return utils.NewError(
+			err,
+			"delete company exec context error",
+		)
+	}
+
+	return nil
 }
 
 func (r *AppCompanyRepository) ListCompanies(
@@ -188,6 +306,8 @@ func (r *AppCompanyRepository) scanRow(
 	err := rowScanner.Scan(
 		&company.ID,
 		&company.Name,
+		&company.Code,
+		&company.Country,
 		&company.PhoneNumber.CountryCode,
 		&company.PhoneNumber.Number,
 		&company.Website,

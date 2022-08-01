@@ -5,6 +5,7 @@ import "syreclabs.com/go/faker"
 type Company struct {
 	SequentialIdentifier
 	Name        string      `json:"name"`
+	Code        string      `json:"code"`
 	Country     string      `json:"country"`
 	Website     string      `json:"website"`
 	Phone       string      `json:"phone"`

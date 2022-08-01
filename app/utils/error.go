@@ -17,7 +17,9 @@ var (
 	ErrorCodeInvalidArgument    ErrorCode = "invalid_argument"
 	ErrorCodeInvalidCredentials ErrorCode = "invalid_credentials"
 	ErrorCodeInvalidForm        ErrorCode = "invalid_form"
+	ErrorCodeInvalidPhone       ErrorCode = "invalid_phone"
 	ErrorCodeInvalidUserStatus  ErrorCode = "invalid_user_status"
+	ErrorCodeNotFound           ErrorCode = "not_found"
 	ErrorCodeRequestFailed      ErrorCode = "request_failed"
 	ErrorCodeRoleForbidden      ErrorCode = "role_forbidden"
 	ErrorCodeSessionExpired     ErrorCode = "session_expired"
@@ -26,7 +28,9 @@ var (
 		ErrorCodeInvalidArgument:    "You have provided an invalid argument",
 		ErrorCodeInvalidCredentials: "You have provided invalid credentials",
 		ErrorCodeInvalidForm:        "You have submitted an invalid form",
+		ErrorCodeInvalidPhone:       "You have provided an invalid phone number",
 		ErrorCodeInvalidUserStatus:  "Your account is not active",
+		ErrorCodeNotFound:           "The requested resource was not found",
 		ErrorCodeRequestFailed:      "Request failed to complete. Please try again",
 		ErrorCodeRoleForbidden:      "You are not allowed to perform this request",
 		ErrorCodeSessionExpired:     "Your session has expired. Login again to proceed.",

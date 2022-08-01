@@ -14,6 +14,7 @@ CREATE TABLE companies
 (
   id                BIGSERIAL         PRIMARY KEY,
   name              VARCHAR(50)       NOT NULL,
+  code              VARCHAR(10)       NOT NULL,
   website           VARCHAR(100)      NOT NULL,
   country_code      VARCHAR(5)        NOT NULL,
   number            VARCHAR(15)       NOT NULL,

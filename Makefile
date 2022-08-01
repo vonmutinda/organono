@@ -29,7 +29,7 @@ test:
 	godo test -- -e .env.test
 
 test-lite:
-	godo test-now -- -e .env.test
+	godo test-lite -- -e .env.test
 
 up:
 	docker-compose -f docker-compose.yml up --remove-orphans
