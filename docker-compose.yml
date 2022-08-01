@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+
+  postgres:
+    image: postgres:12
+    ports:
+      - 5433:5432
+    volumes:
+      - ~/apps/organono-backend/pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=organono_backend
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=admin
+
+  rabbitmq:
+    image: rabbitmq:alpine
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=organono
+      - RABBITMQ_DEFAULT_PASS=password
+      - RABBITMQ_DEFAULT_VHOST=organono_backend
+      - RABBITMQ_ERLANG_COOKIE=QAHpw0kjARdWvwp
+
+  redis:
+    image: redis:5.0
+    ports:
+      - 6380:6379
+    command: redis-server --requirepass pass1234
