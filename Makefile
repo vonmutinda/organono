@@ -1,5 +1,8 @@
 include .env
 
+populate_countries:
+	go run scripts/populate_countries.go -e .env
+
 fmt:
 	go fmt ./...
 
@@ -10,7 +13,7 @@ resetdb:
 	goose -dir 'app/db/migrations' postgres ${DATABASE_URL} reset
 
 rollback:
-	goose -dir 'app/db/db/migrations' postgres ${DATABASE_URL} down
+	goose -dir 'app/db/migrations' postgres ${DATABASE_URL} down
 
 # e.g make migration name=companies 
 migration:
@@ -19,9 +22,14 @@ migration:
 server:
 	go run cmd/main.go -e .env
 
+hello:
+	godo hello
+
 test:
-	export DATABASE_URL="postgres://admin:password@localhost:5433/organono_backend?sslmode=disable" && \
-	go test ./...
+	godo test -- -e .env.test
+
+test-lite:
+	godo test-now -- -e .env.test
 
 up:
 	docker-compose -f docker-compose.yml up --remove-orphans

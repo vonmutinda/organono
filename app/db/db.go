@@ -17,6 +17,11 @@ type DB interface {
 	Close() error
 	Ping() error
 	InTransaction(ctx context.Context, operations func(context.Context, SQLOperations) error) error
+	Valid() bool
+}
+
+type RowScanner interface {
+	Scan(dest ...interface{}) error
 }
 
 type SQLOperations interface {
@@ -73,6 +78,10 @@ func (db *AppDB) InTransaction(
 	}
 
 	return tx.Commit()
+}
+
+func (db *AppDB) Valid() bool {
+	return db.valid
 }
 
 func newPostgresDBWithURL(databaseURL string) *sql.DB {

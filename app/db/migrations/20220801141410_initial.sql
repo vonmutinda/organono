@@ -10,8 +10,6 @@ CREATE TABLE countries
 
 CREATE UNIQUE INDEX countries_code_uniq_idx ON countries(code);
 
-CREATE TYPE OPERATION_STATUS AS ENUM('active', 'closed', 'pending');
-
 CREATE TABLE companies 
 (
   id                BIGSERIAL         PRIMARY KEY,
@@ -19,7 +17,6 @@ CREATE TABLE companies
   website           VARCHAR(100)      NOT NULL,
   country_code      VARCHAR(5)        NOT NULL,
   number            VARCHAR(15)       NOT NULL,
-  operation_status  OPERATION_STATUS  NOT NULL DEFAULT 'pending',
   updated_at        TIMESTAMP         NOT NULL DEFAULT clock_timestamp(),
   created_at        TIMESTAMP         NOT NULL DEFAULT clock_timestamp()
 );
@@ -28,18 +25,23 @@ CREATE UNIQUE INDEX companies_name_uniq_idx ON companies(name);
 CREATE UNIQUE INDEX companies_website_uniq_idx ON companies(website);
 CREATE UNIQUE INDEX companies_number_uniq_idx ON companies(country_code, number);
 
-CREATE TABLE company_countries (
-  id             BIGSERIAL     PRIMARY KEY,
-  company_id     BIGINT        NOT NULL REFERENCES companies(id),
-  country_id     BIGINT        NOT NULL REFERENCES countries(id),
-  created_at     TIMESTAMP     NOT NULL DEFAULT clock_timestamp()
+CREATE TYPE OPERATION_STATUS AS ENUM('active', 'closed', 'pending');
+
+CREATE TABLE company_countries 
+(
+  id                BIGSERIAL         PRIMARY KEY,
+  company_id        BIGINT            NOT NULL REFERENCES companies(id),
+  country_id        BIGINT            NOT NULL REFERENCES countries(id),
+  operation_status  OPERATION_STATUS  NOT NULL DEFAULT 'pending',
+  updated_at        TIMESTAMP         NOT NULL DEFAULT clock_timestamp(),
+  created_at        TIMESTAMP         NOT NULL DEFAULT clock_timestamp()
 );
 
 CREATE UNIQUE INDEX company_countries_uniq_idx ON company_countries(company_id, country_id);
  
 CREATE TYPE USER_STATUS AS ENUM ('active', 'deactivated', 'unverified');
 
-CREATE TABLE users 
+CREATE TABLE users
 (
   id                BIGSERIAL       PRIMARY KEY,
   first_name        VARCHAR(20)     NOT NULL,
@@ -71,12 +73,18 @@ DROP INDEX IF EXISTS sessions_idx;
 DROP TABLE sessions;
 
 DROP TABLE users;
+DROP TYPE IF EXISTS USER_STATUS;
 
-DROP INDEX IF EXISTS company_country_uniq_idx;
+DROP INDEX IF EXISTS company_countries_uniq_idx;
 DROP TABLE IF EXISTS company_countries;
 
-DROP TABLE IF EXISTS companies;
 DROP TYPE IF EXISTS OPERATION_STATUS;
+
+DROP INDEX IF EXISTS companies_number_uniq_idx;
+DROP INDEX IF EXISTS companies_website_uniq_idx;
+DROP INDEX IF EXISTS companies_name_uniq_idx;
+
+DROP TABLE IF EXISTS companies;
 
 DROP INDEX IF EXISTS countries_code_uniq_idx;
 DROP TABLE IF EXISTS countries;
