@@ -12,6 +12,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/vonmutinda/organono/app/db"
 	"github.com/vonmutinda/organono/app/logger"
+	"github.com/vonmutinda/organono/app/utils"
 	"github.com/vonmutinda/organono/app/web/router"
 )
 
@@ -39,6 +40,8 @@ func main() {
 	dB := db.InitDB()
 	defer dB.Close()
 
+	utils.LoadTestData(dB)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
@@ -46,7 +49,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:    ":" + port,
-		Handler: router.BuildRouter(),
+		Handler: router.BuildRouter(dB),
 	}
 
 	done := make(chan struct{})

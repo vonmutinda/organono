@@ -53,6 +53,8 @@ CREATE TABLE users
   updated_at        TIMESTAMPTZ     NOT NULL DEFAULT clock_timestamp()
 );
 
+CREATE UNIQUE INDEX users_username_uniq_idx ON users(username);
+
 CREATE TABLE sessions
 (
   id                  BIGSERIAL        PRIMARY KEY,
@@ -72,6 +74,7 @@ CREATE INDEX sessions_idx ON sessions(user_id) WHERE user_id IS NOT NULL;
 DROP INDEX IF EXISTS sessions_idx;
 DROP TABLE sessions;
 
+DROP INDEX IF EXISTS users_username_uniq_idx;
 DROP TABLE users;
 DROP TYPE IF EXISTS USER_STATUS;
 

@@ -20,7 +20,7 @@ type CompanyList struct {
 func BuildCompany(country *Country) *Company {
 
 	phoneNumber := fakePhoneNumber()
-	
+
 	return &Company{
 		Name:        faker.Company().Name(),
 		Country:     country.Name,
