@@ -23,6 +23,7 @@ CREATE TABLE companies
 );
 
 CREATE UNIQUE INDEX companies_name_uniq_idx ON companies(name);
+CREATE UNIQUE INDEX companies_code_uniq_idx ON companies(code);
 CREATE UNIQUE INDEX companies_website_uniq_idx ON companies(website);
 CREATE UNIQUE INDEX companies_number_uniq_idx ON companies(country_code, number);
 
@@ -31,7 +32,7 @@ CREATE TYPE OPERATION_STATUS AS ENUM('active', 'closed', 'pending');
 CREATE TABLE company_countries 
 (
   id                BIGSERIAL         PRIMARY KEY,
-  company_id        BIGINT            NOT NULL REFERENCES companies(id),
+  company_id        BIGINT            NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
   country_id        BIGINT            NOT NULL REFERENCES countries(id),
   operation_status  OPERATION_STATUS  NOT NULL DEFAULT 'pending',
   updated_at        TIMESTAMP         NOT NULL DEFAULT clock_timestamp(),

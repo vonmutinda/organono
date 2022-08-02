@@ -20,6 +20,7 @@ var (
 	ErrorCodeInvalidPhone       ErrorCode = "invalid_phone"
 	ErrorCodeInvalidUserStatus  ErrorCode = "invalid_user_status"
 	ErrorCodeNotFound           ErrorCode = "not_found"
+	ErrorCodeResourceExists     ErrorCode = "resource_exists"
 	ErrorCodeRequestFailed      ErrorCode = "request_failed"
 	ErrorCodeRoleForbidden      ErrorCode = "role_forbidden"
 	ErrorCodeSessionExpired     ErrorCode = "session_expired"
@@ -31,6 +32,7 @@ var (
 		ErrorCodeInvalidPhone:       "You have provided an invalid phone number",
 		ErrorCodeInvalidUserStatus:  "Your account is not active",
 		ErrorCodeNotFound:           "The requested resource was not found",
+		ErrorCodeResourceExists:     "Another resource with similar attributes already exists",
 		ErrorCodeRequestFailed:      "Request failed to complete. Please try again",
 		ErrorCodeRoleForbidden:      "You are not allowed to perform this request",
 		ErrorCodeSessionExpired:     "Your session has expired. Login again to proceed.",
@@ -100,6 +102,10 @@ func (e *Error) Error() string {
 
 func (e *Error) Err() error {
 	return e.err
+}
+
+func (e *Error) GetErrorCode() ErrorCode {
+	return e.errorCode
 }
 
 func (e *Error) JsonResponse() map[string]string {

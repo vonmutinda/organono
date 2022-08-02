@@ -63,10 +63,18 @@ func (s *AppCompanyService) CreateCompany(
 		return &entities.Company{}, err
 	}
 
+	phoneNumber, err := utils.ParsePhoneNumber(form.Phone)
+	if err != nil {
+		return &entities.Company{}, err
+	}
+
 	company := &entities.Company{
-		Name:    form.Name,
-		Code:    form.Code,
-		Website: form.Website,
+		Name:        form.Name,
+		Code:        form.Code,
+		Website:     form.Website,
+		Country:     country.Name,
+		PhoneNumber: phoneNumber,
+		Phone:       phoneNumber.Phone(),
 	}
 
 	err = dB.InTransaction(ctx, func(ctx context.Context, operations db.SQLOperations) error {
@@ -77,8 +85,9 @@ func (s *AppCompanyService) CreateCompany(
 		}
 
 		companyCountry := entities.CompanyCountry{
-			CompanyID: company.ID,
-			CountryID: country.ID,
+			CompanyID:       company.ID,
+			CountryID:       country.ID,
+			OperationStatus: entities.OperationStatusTypeActive,
 		}
 
 		return s.companyCountryRepository.Save(ctx, operations, &companyCountry)
@@ -187,6 +196,7 @@ func (s *AppCompanyService) UpdateCompany(
 		}
 
 		company.PhoneNumber = phoneNumber
+		company.Phone = company.PhoneNumber.Phone()
 	}
 
 	if form.Name.Valid {
@@ -291,7 +301,7 @@ func (s *AppCompanyService) validateDuplicateCompanyCode(
 
 	return utils.NewErrorWithCode(
 		errors.New("company code already exists"),
-		utils.ErrorCodeInvalidForm,
+		utils.ErrorCodeResourceExists,
 		"duplicate company code",
 	)
 }
@@ -312,7 +322,7 @@ func (s *AppCompanyService) validateDuplicateCompanyName(
 
 	return utils.NewErrorWithCode(
 		errors.New("company name already exists"),
-		utils.ErrorCodeInvalidForm,
+		utils.ErrorCodeResourceExists,
 		"duplicate company name",
 	)
 }
@@ -338,7 +348,7 @@ func (s *AppCompanyService) validateDuplicateCompanyPhoneNumber(
 
 	return utils.NewErrorWithCode(
 		errors.New("company phone already exists"),
-		utils.ErrorCodeInvalidForm,
+		utils.ErrorCodeResourceExists,
 		"duplicate company phone",
 	)
 }
@@ -359,7 +369,7 @@ func (s *AppCompanyService) validateDuplicateCompanyWebsite(
 
 	return utils.NewErrorWithCode(
 		errors.New("company website already exists"),
-		utils.ErrorCodeInvalidForm,
+		utils.ErrorCodeResourceExists,
 		"duplicate website code",
 	)
 }

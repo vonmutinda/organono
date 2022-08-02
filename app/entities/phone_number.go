@@ -19,6 +19,6 @@ func (pn PhoneNumber) Phone() string {
 func fakePhoneNumber() PhoneNumber {
 	return PhoneNumber{
 		CountryCode: null.StringFrom("+357"),
-		Number:      null.StringFrom("9" + faker.Number().Number(7)),
+		Number:      null.StringFrom("9003" + faker.Number().Number(4)),
 	}
 }

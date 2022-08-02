@@ -35,7 +35,7 @@ func AllowOnlyActiveUser(
 		}
 
 		if isCyprus {
-			return
+			c.Next()
 		}
 
 		err = validateSession(c, dB, sessionAuthenticator, sessionService, "user")

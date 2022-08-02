@@ -19,7 +19,7 @@ const (
 	getCompanyByNameSQL        = getCompaniesSQL + " WHERE co.name = $1"
 	getCompanyByPhoneNumberSQL = getCompaniesSQL + " WHERE co.country_code = $1 AND co.number = $2"
 	getCompanyByWebsiteSQL     = getCompaniesSQL + " WHERE co.website = $1"
-	getCompanyCountSQL         = "SELECT COUNT(co.id) FROM companies co"
+	getCompanyCountSQL         = "SELECT COUNT(co.id) FROM companies co JOIN company_countries cc ON cc.company_id = co.id JOIN countries c ON c.id = cc.country_id"
 	saveCompanySQL             = "INSERT INTO companies (name, code, website, country_code, number, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id"
 	updateCompanySQL           = "UPDATE companies SET name = $1, code = $2, website = $3, country_code = $4, number = $5, updated_at = $6 WHERE id = $7"
 )
@@ -173,8 +173,6 @@ func (r *AppCompanyRepository) ListCompanies(
 ) ([]*entities.Company, error) {
 
 	query, args := r.buildQuery(getCompaniesSQL, filter)
-
-	fmt.Printf("list companies query: %v\n\nargs = %v\n\n", query, args)
 
 	rows, err := operations.QueryContext(ctx, query, args...)
 	if err != nil {

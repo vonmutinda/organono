@@ -32,37 +32,30 @@ type (
 func NewIPAPI() *AppIPAPI {
 	return &AppIPAPI{
 		client: &http.Client{
-			Timeout: time.Second * 10,
+			Timeout: time.Second * 5,
 		},
 	}
 }
 
 func (p *AppIPAPI) CountryForIP(ipAddress string) (*CountryWithIP, error) {
 
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf(ipAPIURL, ipAddress), nil)
+	response, err := http.Get(fmt.Sprintf(ipAPIURL, ipAddress))
 	if err != nil {
-		return &CountryWithIP{}, err
-	}
-
-	req.Header.Add("Content-Type", "application/json")
-
-	response, err := p.client.Do(req)
-	if err != nil {
-		return &CountryWithIP{}, err
+		return &CountryWithIP{}, fmt.Errorf("failed to get response err = %v", err)
 	}
 
 	defer response.Body.Close()
 
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return &CountryWithIP{}, err
+		return &CountryWithIP{}, fmt.Errorf("failed to read response body = %v", err)
 	}
 
 	var countryWithIP CountryWithIP
 
 	err = json.Unmarshal(data, &countryWithIP)
 	if err != nil {
-		return &CountryWithIP{}, err
+		return &CountryWithIP{}, fmt.Errorf("failed to unmarshal response body err = %v", err)
 	}
 
 	return &countryWithIP, nil

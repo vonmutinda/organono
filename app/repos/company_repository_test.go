@@ -198,6 +198,24 @@ func TestCompanyRepository(t *testing.T) {
 			So(foundCompanies[0].ID, ShouldEqual, appleCyprus.ID)
 		})
 
+		Convey("can list companies based on term filter - phone number", func() {
+
+			_, _, err := CreateCompany(ctx, dB, "Google", country)
+			So(err, ShouldBeNil)
+
+			appleCyprus, _, err := CreateCompany(ctx, dB, "Apple", country)
+			So(err, ShouldBeNil)
+
+			filter := &forms.Filter{
+				Term: "app",
+			}
+
+			foundCompanies, err := companyRepository.ListCompanies(ctx, dB, filter)
+			So(err, ShouldBeNil)
+			So(len(foundCompanies), ShouldEqual, 1)
+			So(foundCompanies[0].ID, ShouldEqual, appleCyprus.ID)
+		})
+
 		Convey("can list companies based on term filter - code", func() {
 
 			_, _, err := CreateCompany(ctx, dB, "Google", country)
@@ -222,14 +240,17 @@ func TestCompanyRepository(t *testing.T) {
 			err := companyRepository.Save(ctx, dB, closedCompany)
 			So(err, ShouldBeNil)
 
-			closedCyprusCountry := entities.BuildCompanyCountry(closedCompany.ID, country.ID)
-			closedCyprusCountry.OperationStatus = entities.OperationStatusTypeClosed
-
-			err = companyCountryRepository.Save(ctx, dB, closedCyprusCountry)
-			So(err, ShouldBeNil)
-
 			activeCompany := entities.BuildCompany("Redbull", country)
 			err = companyRepository.Save(ctx, dB, activeCompany)
+			So(err, ShouldBeNil)
+
+			closedCyprusCompany := entities.BuildCompanyCountry(closedCompany.ID, country.ID)
+			closedCyprusCompany.OperationStatus = entities.OperationStatusTypeClosed
+			err = companyCountryRepository.Save(ctx, dB, closedCyprusCompany)
+			So(err, ShouldBeNil)
+
+			activeCyprusCompany := entities.BuildCompanyCountry(activeCompany.ID, country.ID)
+			err = companyCountryRepository.Save(ctx, dB, activeCyprusCompany)
 			So(err, ShouldBeNil)
 
 			filter := &forms.Filter{

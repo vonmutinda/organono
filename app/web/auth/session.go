@@ -38,10 +38,12 @@ type AppSessionAuthenticator struct {
 }
 
 func NewSessionAuthenticator(
+	ipAPIProvider providers.IPAPI,
 	sessionRepository repos.SessionRepository,
 	userRepository repos.UserRepository,
 ) SessionAuthenticator {
 	return NewSessionAuthenticatorWithJWTHandler(
+		ipAPIProvider,
 		NewJWTHandler(),
 		sessionRepository,
 		userRepository,
@@ -49,11 +51,13 @@ func NewSessionAuthenticator(
 }
 
 func NewSessionAuthenticatorWithJWTHandler(
+	ipAPIProvider providers.IPAPI,
 	jwtHandler JWTHandler,
 	sessionRepository repos.SessionRepository,
 	userRepository repos.UserRepository,
 ) SessionAuthenticator {
 	return &AppSessionAuthenticator{
+		ipAPIProvider:     ipAPIProvider,
 		jwtHandler:        jwtHandler,
 		sessionRepository: sessionRepository,
 		userRepository:    userRepository,
@@ -66,8 +70,13 @@ func (a *AppSessionAuthenticator) IsCyrpusIPAddress(
 
 	lookupIPAddress := ctxhelper.IPAddress(ctx)
 
+	if lookupIPAddress == "" {
+		return false, nil
+	}
+
 	countryWithIp, err := a.ipAPIProvider.CountryForIP(lookupIPAddress)
 	if err != nil {
+		fmt.Println("error here : = ", err)
 		return false, err
 	}
 
@@ -75,7 +84,7 @@ func (a *AppSessionAuthenticator) IsCyrpusIPAddress(
 		return true, nil
 	}
 
-	return false, fmt.Errorf("ip country = %v", countryWithIp.CountryName)
+	return false, nil
 }
 
 func (a *AppSessionAuthenticator) RefreshTokenFromRequest(

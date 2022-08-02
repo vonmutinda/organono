@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/vonmutinda/organono/app/db"
+	"github.com/vonmutinda/organono/app/providers"
 	"github.com/vonmutinda/organono/app/repos"
 	"github.com/vonmutinda/organono/app/services"
 	"github.com/vonmutinda/organono/app/web/api/companies"
@@ -33,7 +34,7 @@ func BuildRouter(
 
 	sessionRepository := repos.NewSessionRepository()
 	userRepository := repos.NewUserRepository()
-	sessionAuthenticator := auth.NewSessionAuthenticator(sessionRepository, userRepository)
+	sessionAuthenticator := auth.NewSessionAuthenticator(providers.NewIPAPI(), sessionRepository, userRepository)
 
 	defaultMiddlewares := middleware.DefaultMiddlewares(sessionAuthenticator)
 	router.Use(defaultMiddlewares...)
