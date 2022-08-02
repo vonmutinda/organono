@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	getUserByIDSQL       = "SELECT id, first_name, last_name, username, password_hash, status, created_at, updated_at FROM users WHERE id = $1"
-	getUserByUsernameSQL = "SELECT id, username, password, email, created_at, updated_at FROM users WHERE username = $1"
+	getUserByIDSQL       = getUsersSQL + " WHERE id = $1"
+	getUserByUsernameSQL = getUsersSQL + " WHERE username = $1"
+	getUsersSQL          = "SELECT id, first_name, last_name, username, password_hash, status, created_at, updated_at FROM users "
 	saveUserSQL          = "INSERT INTO users (first_name, last_name, username, password_hash, status, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id"
 	updateUserSQL        = "UPDATE users SET first_name = $1, last_name = $2, username = $3, password_hash = $4, status = $5, updated_at = $6 WHERE id = $7"
 )
@@ -120,8 +121,9 @@ func (r *AppUserRepository) Save(
 		user.ID,
 	)
 	if err != nil {
-		return utils.NewError(
+		return utils.NewErrorWithCode(
 			err,
+			utils.ErrorCodeRequestFailed,
 			"update user exec context error",
 		)
 	}

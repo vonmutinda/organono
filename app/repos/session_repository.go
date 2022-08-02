@@ -10,7 +10,7 @@ import (
 
 const (
 	getSessionByIDSQL = "SELECT s.id, s.deactivated_at, s.ip_address, s.last_refreshed_at, s.user_agent, u.status, s.user_id, s.created_at, s.updated_at FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.id = $1"
-	saveSessionSQL    = "INSERT INTO sessions (deactivated_at, ip_address, last_refreshed_at, user_agent, user_id, created_at) VALUES ($1, $2, $3, $4, $5)"
+	saveSessionSQL    = "INSERT INTO sessions (deactivated_at, ip_address, last_refreshed_at, user_agent, user_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id"
 	updateSessionSQL  = "UPDATE sessions SET deactivated_at = $1, last_refreshed_at = $2, updated_at = $3 WHERE id = $4"
 )
 
