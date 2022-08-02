@@ -11,7 +11,7 @@ A simple lightweight service for managing companies
 #### Run Application Locally
 
 - Clone the repo `git clone https://github.com/vonmutinda/organono.git && cd organono`
-- Create `.env` file using `.env.sample` file
+- Create `.env` and `.env.test` using `.env.sample` and `.env.test.sample` files respectively
 - Start PostgresSQL server `make up`
 - Install goose `go install github.com/pressly/goose/cmd/goose@latest`
 - Run Migrations `make migrate`
