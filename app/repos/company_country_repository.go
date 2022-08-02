@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	saveCompanyCountrySQL = "INSERT INTO company_countries (company_id, country_id, operation_status, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)"
+	saveCompanyCountrySQL = "INSERT INTO company_countries (company_id, country_id, operation_status, created_at, updated_at) VALUES ($1, $2, $3, $4, $5) RETURNING id"
 )
 
 type (
@@ -33,22 +33,27 @@ func (r *AppCompanyCountryRepository) Save(
 
 	companyCountry.Touch()
 
-	err := operations.QueryRowContext(
-		ctx,
-		saveCompanyCountrySQL,
-		companyCountry.CompanyID,
-		companyCountry.CountryID,
-		companyCountry.OperationStatus,
-		companyCountry.CreatedAt,
-		companyCountry.UpdatedAt,
-	).Scan(
-		&companyCountry.ID,
-	)
-	if err != nil {
-		return utils.NewError(
-			err,
-			"save company country query row error",
+	if companyCountry.IsNew() {
+
+		err := operations.QueryRowContext(
+			ctx,
+			saveCompanyCountrySQL,
+			companyCountry.CompanyID,
+			companyCountry.CountryID,
+			companyCountry.OperationStatus,
+			companyCountry.CreatedAt,
+			companyCountry.UpdatedAt,
+		).Scan(
+			&companyCountry.ID,
 		)
+		if err != nil {
+			return utils.NewError(
+				err,
+				"save company country query row error",
+			)
+		}
+
+		return nil
 	}
 
 	return errors.New("cannot update company country")

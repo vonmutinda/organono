@@ -13,14 +13,15 @@ import (
 
 const (
 	deleteCompanySQL           = "DELETE FROM companies WHERE id = $1"
-	getCompaniesSQL            = "SELECT co.id, co.name, co.code c.name, co.website, co.country_code, co.number, co.created_at, co.updated_at FROM companies co JOIN company_countries cc ON cc.company_id = comp.id JOIN countries c ON c.id = cc.country_id"
+	getCompaniesSQL            = "SELECT co.id, co.name, co.code, c.name, co.website, co.country_code, co.number, cc.operation_status, co.created_at, co.updated_at FROM companies co JOIN company_countries cc ON cc.company_id = co.id JOIN countries c ON c.id = cc.country_id"
 	getCompanyByCodeSQL        = getCompaniesSQL + " WHERE co.code = $1"
 	getCompanyByIDSQL          = getCompaniesSQL + " WHERE co.id = $1"
 	getCompanyByNameSQL        = getCompaniesSQL + " WHERE co.name = $1"
 	getCompanyByPhoneNumberSQL = getCompaniesSQL + " WHERE co.country_code = $1 AND co.number = $2"
 	getCompanyByWebsiteSQL     = getCompaniesSQL + " WHERE co.website = $1"
-	saveCompanySQL             = "INSERT INTO companies (name, created_at, updated_at) VALUES ($1, $2, $3)"
-	updateCompanySQL           = "UPDATE companies SET name = $1, website = $2, country_code = $3, number = $4, updated_at = $5 WHERE id = $6"
+	getCompanyCountSQL         = "SELECT COUNT(co.id) FROM companies co"
+	saveCompanySQL             = "INSERT INTO companies (name, code, website, country_code, number, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id"
+	updateCompanySQL           = "UPDATE companies SET name = $1, code = $2, website = $3, country_code = $4, number = $5, updated_at = $6 WHERE id = $7"
 )
 
 type (
@@ -127,7 +128,7 @@ func (r *AppCompanyRepository) CompanyCount(
 
 	var count int
 
-	query, args := r.buildQuery(getCompaniesSQL, filter.NoPagination())
+	query, args := r.buildQuery(getCompanyCountSQL, filter.NoPagination())
 
 	err := operations.QueryRowContext(
 		ctx,
@@ -173,11 +174,9 @@ func (r *AppCompanyRepository) ListCompanies(
 
 	query, args := r.buildQuery(getCompaniesSQL, filter)
 
-	rows, err := operations.QueryContext(
-		ctx,
-		query,
-		args...,
-	)
+	fmt.Printf("list companies query: %v\n\nargs = %v\n\n", query, args)
+
+	rows, err := operations.QueryContext(ctx, query, args...)
 	if err != nil {
 		return []*entities.Company{}, utils.NewError(
 			err,
@@ -223,6 +222,10 @@ func (r *AppCompanyRepository) Save(
 			ctx,
 			saveCompanySQL,
 			company.Name,
+			company.Code,
+			company.Website,
+			company.PhoneNumber.CountryCode,
+			company.PhoneNumber.Number,
 			company.CreatedAt,
 			company.UpdatedAt,
 		).Scan(
@@ -242,10 +245,12 @@ func (r *AppCompanyRepository) Save(
 		ctx,
 		updateCompanySQL,
 		company.Name,
+		company.Code,
 		company.Website,
 		company.PhoneNumber.CountryCode,
 		company.PhoneNumber.Number,
 		company.UpdatedAt,
+		company.ID,
 	)
 	if err != nil {
 		return utils.NewError(
@@ -262,12 +267,12 @@ func (r *AppCompanyRepository) buildQuery(
 	filter *forms.Filter,
 ) (string, []interface{}) {
 
-	conditions := make([]string, 0)
 	args := make([]interface{}, 0)
+	conditions := make([]string, 0)
 	counter := utils.NewPlaceholder()
 
 	if filter.Term != "" {
-		filterColumns := []string{"co.name", "c.name", "co.website", "CONCAT(co.country_code, co.number)"}
+		filterColumns := []string{"co.name", "co.code", "co.website", "c.name", "CONCAT(co.country_code, co.number)"}
 		likeStatements := make([]string, 0)
 
 		args = append(args, strings.ToLower(filter.Term))
@@ -281,7 +286,7 @@ func (r *AppCompanyRepository) buildQuery(
 	}
 
 	if filter.Status != "" {
-		conditions = append(conditions, fmt.Sprintf(" cc.status = $%d", counter.Touch()))
+		conditions = append(conditions, fmt.Sprintf(" cc.operation_status = $%d", counter.Touch()))
 		args = append(args, filter.Status)
 	}
 
@@ -308,9 +313,10 @@ func (r *AppCompanyRepository) scanRow(
 		&company.Name,
 		&company.Code,
 		&company.Country,
+		&company.Website,
 		&company.PhoneNumber.CountryCode,
 		&company.PhoneNumber.Number,
-		&company.Website,
+		&company.OperationStatus,
 		&company.CreatedAt,
 		&company.UpdatedAt,
 	)
@@ -320,5 +326,6 @@ func (r *AppCompanyRepository) scanRow(
 			"scan company row error",
 		)
 	}
+
 	return &company, nil
 }

@@ -18,7 +18,7 @@ func WithTestDB(
 
 		var dbTx *sql.Tx
 
-		// dB := db.NewTestDB(dbTx)
+		dB := db.NewTestDB(dbTx)
 
 		if testDB.Valid() {
 			_, err := testDB.ExecContext(ctx, "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE")
@@ -26,7 +26,7 @@ func WithTestDB(
 
 			dbTx, err = testDB.Begin()
 			convey.So(err, convey.ShouldBeNil)
-			// dB = db.NewTestDB(dbTx)
+			dB = db.NewTestDB(dbTx)
 		}
 
 		convey.Reset(func() {
@@ -36,6 +36,6 @@ func WithTestDB(
 			}
 		})
 
-		f(ctx, testDB)
+		f(ctx, dB)
 	}
 }

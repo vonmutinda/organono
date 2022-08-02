@@ -7,8 +7,8 @@ import (
 	"github.com/vonmutinda/organono/app/entities"
 )
 
-func CreateCompany(ctx context.Context, dB db.DB, country *entities.Country) (*entities.Company, *entities.CompanyCountry, error) {
-	company := entities.BuildCompany(country)
+func CreateCompany(ctx context.Context, dB db.DB, companyName string, country *entities.Country) (*entities.Company, *entities.CompanyCountry, error) {
+	company := entities.BuildCompany(companyName, country)
 	err := NewCompanyRepository().Save(ctx, dB, company)
 	if err != nil {
 		return &entities.Company{}, &entities.CompanyCountry{}, err
@@ -21,6 +21,12 @@ func CreateCompanyCountry(ctx context.Context, dB db.DB, companyID, countryID in
 	companyCountry := entities.BuildCompanyCountry(companyID, countryID)
 	err := NewCompanyCountryRepository().Save(ctx, dB, companyCountry)
 	return companyCountry, err
+}
+
+func CreateCountry(ctx context.Context, dB db.DB) (*entities.Country, error) {
+	country := entities.BuildCountry()
+	err := NewCountryRepository().Save(ctx, dB, country)
+	return country, err
 }
 
 func CreateSession(ctx context.Context, dB db.DB, userID int64) (*entities.Session, error) {

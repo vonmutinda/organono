@@ -57,7 +57,7 @@ func TestUserRepository(t *testing.T) {
 
 			user.FirstName = "Trading"
 			user.LastName = "Point"
-			user.Username = "xm"
+			user.Username = "tradingpoint"
 			user.Status = entities.UserStatusDeactivated
 
 			err = userRepository.Save(ctx, dB, user)

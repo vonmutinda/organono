@@ -121,9 +121,8 @@ func (r *AppUserRepository) Save(
 		user.ID,
 	)
 	if err != nil {
-		return utils.NewErrorWithCode(
+		return utils.NewError(
 			err,
-			utils.ErrorCodeRequestFailed,
 			"update user exec context error",
 		)
 	}
