@@ -8,6 +8,7 @@ import (
 	"github.com/vonmutinda/organono/app/db"
 	"github.com/vonmutinda/organono/app/repos"
 	"github.com/vonmutinda/organono/app/services"
+	"github.com/vonmutinda/organono/app/web/api/companies"
 	"github.com/vonmutinda/organono/app/web/api/sessions"
 	"github.com/vonmutinda/organono/app/web/auth"
 	"github.com/vonmutinda/organono/app/web/middleware"
@@ -37,7 +38,17 @@ func BuildRouter(
 	defaultMiddlewares := middleware.DefaultMiddlewares(sessionAuthenticator)
 	router.Use(defaultMiddlewares...)
 
+	// Repositories
+	companyCountryRepository := repos.NewCompanyCountryRepository()
+	companyRepository := repos.NewCompanyRepository()
+	countryRepository := repos.NewCountryRepository()
+
 	// Services
+	companyService := services.NewCompanyService(
+		companyCountryRepository,
+		companyRepository,
+		countryRepository,
+	)
 	sessionService := services.NewSessionService(sessionRepository, userRepository)
 
 	// Open endpoints
@@ -46,13 +57,11 @@ func BuildRouter(
 
 	// User endpoints
 	activeUsers := appV1Router.Group("")
-	activeUsers.Use(auth.AllowOnlyActiveUser(
-		dB,
-		sessionAuthenticator,
-		sessionService,
-	))
+	activeUsers.Use(auth.AllowOnlyActiveUser(dB, sessionAuthenticator, sessionService))
 
 	sessions.AddEndpoints(activeUsers, dB, sessionService)
+	companies.AddEndpoints(activeUsers, dB, companyService)
+
 	router.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error_message": "Endpoint not found"})
 	})

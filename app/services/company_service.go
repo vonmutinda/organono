@@ -15,6 +15,7 @@ type (
 	CompanyService interface {
 		CreateCompany(ctx context.Context, dB db.DB, form *forms.CreateCompanyForm) (*entities.Company, error)
 		DeleteCompany(ctx context.Context, dB db.DB, companyID int64) (*entities.Company, error)
+		GetCompany(ctx context.Context, dB db.DB, companyID int64) (*entities.Company, error)
 		ListCompanies(ctx context.Context, dB db.DB, filter *forms.Filter) (*entities.CompanyList, error)
 		UpdateCompany(ctx context.Context, dB db.DB, companyID int64, form *forms.UpdateCompanyForm) (*entities.Company, error)
 	}
@@ -26,7 +27,7 @@ type (
 	}
 )
 
-func NewCompanyCountryService(
+func NewCompanyService(
 	companyCountryRepository repos.CompanyCountryRepository,
 	companyRepository repos.CompanyRepository,
 	countryReposistory repos.CountryRepository,
@@ -38,7 +39,7 @@ func NewCompanyCountryService(
 	}
 }
 
-func NewTestCompanyCountryService() *AppCompanyService {
+func NewTestCompanyService() *AppCompanyService {
 	return &AppCompanyService{
 		companyCountryRepository: repos.NewCompanyCountryRepository(),
 		companyRepository:        repos.NewCompanyRepository(),
@@ -53,6 +54,11 @@ func (s *AppCompanyService) CreateCompany(
 ) (*entities.Company, error) {
 
 	err := s.validateCreateCompany(ctx, dB, form)
+	if err != nil {
+		return &entities.Company{}, err
+	}
+
+	country, err := s.getCountryByName(ctx, dB, form.Country)
 	if err != nil {
 		return &entities.Company{}, err
 	}
@@ -72,7 +78,7 @@ func (s *AppCompanyService) CreateCompany(
 
 		companyCountry := entities.CompanyCountry{
 			CompanyID: company.ID,
-			CountryID: form.CountryID,
+			CountryID: country.ID,
 		}
 
 		return s.companyCountryRepository.Save(ctx, operations, &companyCountry)
@@ -106,6 +112,28 @@ func (s *AppCompanyService) DeleteCompany(
 	err = s.companyRepository.DeleteCompany(ctx, dB, company.ID)
 	if err != nil {
 		return &entities.Company{}, err
+	}
+
+	return company, nil
+}
+
+func (s *AppCompanyService) GetCompany(
+	ctx context.Context,
+	dB db.DB,
+	companyID int64,
+) (*entities.Company, error) {
+
+	company, err := s.companyRepository.CompanyByID(ctx, dB, companyID)
+	if err != nil {
+		if !utils.IsErrNoRows(err) {
+			return &entities.Company{}, err
+		}
+
+		return &entities.Company{}, utils.NewErrorWithCode(
+			err,
+			utils.ErrorCodeNotFound,
+			"company not found",
+		)
 	}
 
 	return company, nil
@@ -187,35 +215,22 @@ func (s *AppCompanyService) validateCreateCompany(
 	form *forms.CreateCompanyForm,
 ) error {
 
-	_, err := s.countryReposistory.CountryByID(ctx, dB, form.CountryID)
-	if err != nil {
-		if !utils.IsErrNoRows(err) {
-			return err
-		}
-
-		return utils.NewErrorWithCode(
-			err,
-			utils.ErrorCodeNotFound,
-			"country not found",
-		)
-	}
-
-	err = s.validateCompanyCodeExists(ctx, dB, form.Code)
+	err := s.validateDuplicateCompanyCode(ctx, dB, form.Code)
 	if err != nil {
 		return err
 	}
 
-	err = s.validateCompanyNameExists(ctx, dB, form.Name)
+	err = s.validateDuplicateCompanyName(ctx, dB, form.Name)
 	if err != nil {
 		return err
 	}
 
-	err = s.validateCompanyPhoneNumberExists(ctx, dB, form.Phone)
+	err = s.validateDuplicateCompanyPhoneNumber(ctx, dB, form.Phone)
 	if err != nil {
 		return err
 	}
 
-	err = s.validateCompanyWebsiteExists(ctx, dB, form.Website)
+	err = s.validateDuplicateCompanyWebsite(ctx, dB, form.Website)
 	if err != nil {
 		return err
 	}
@@ -230,28 +245,28 @@ func (s *AppCompanyService) validateUpdateCompany(
 ) error {
 
 	if form.Code.Valid {
-		err := s.validateCompanyCodeExists(ctx, dB, form.Code.String)
+		err := s.validateDuplicateCompanyCode(ctx, dB, form.Code.String)
 		if err != nil {
 			return err
 		}
 	}
 
 	if form.Name.Valid {
-		err := s.validateCompanyNameExists(ctx, dB, form.Name.String)
+		err := s.validateDuplicateCompanyName(ctx, dB, form.Name.String)
 		if err != nil {
 			return err
 		}
 	}
 
 	if form.Phone.Valid {
-		err := s.validateCompanyPhoneNumberExists(ctx, dB, form.Phone.String)
+		err := s.validateDuplicateCompanyPhoneNumber(ctx, dB, form.Phone.String)
 		if err != nil {
 			return err
 		}
 	}
 
 	if form.Website.Valid {
-		err := s.validateCompanyWebsiteExists(ctx, dB, form.Website.String)
+		err := s.validateDuplicateCompanyWebsite(ctx, dB, form.Website.String)
 		if err != nil {
 			return err
 		}
@@ -260,7 +275,7 @@ func (s *AppCompanyService) validateUpdateCompany(
 	return nil
 }
 
-func (s *AppCompanyService) validateCompanyCodeExists(
+func (s *AppCompanyService) validateDuplicateCompanyCode(
 	ctx context.Context,
 	dB db.DB,
 	code string,
@@ -281,7 +296,7 @@ func (s *AppCompanyService) validateCompanyCodeExists(
 	)
 }
 
-func (s *AppCompanyService) validateCompanyNameExists(
+func (s *AppCompanyService) validateDuplicateCompanyName(
 	ctx context.Context,
 	dB db.DB,
 	name string,
@@ -302,7 +317,7 @@ func (s *AppCompanyService) validateCompanyNameExists(
 	)
 }
 
-func (s *AppCompanyService) validateCompanyPhoneNumberExists(
+func (s *AppCompanyService) validateDuplicateCompanyPhoneNumber(
 	ctx context.Context,
 	dB db.DB,
 	phone string,
@@ -328,7 +343,7 @@ func (s *AppCompanyService) validateCompanyPhoneNumberExists(
 	)
 }
 
-func (s *AppCompanyService) validateCompanyWebsiteExists(
+func (s *AppCompanyService) validateDuplicateCompanyWebsite(
 	ctx context.Context,
 	dB db.DB,
 	code string,
@@ -347,4 +362,26 @@ func (s *AppCompanyService) validateCompanyWebsiteExists(
 		utils.ErrorCodeInvalidForm,
 		"duplicate website code",
 	)
+}
+
+func (s *AppCompanyService) getCountryByName(
+	ctx context.Context,
+	dB db.DB,
+	countryName string,
+) (*entities.Country, error) {
+
+	country, err := s.countryReposistory.CountryByName(ctx, dB, countryName)
+	if err != nil {
+		if !utils.IsErrNoRows(err) {
+			return &entities.Country{}, err
+		}
+
+		return &entities.Country{}, utils.NewErrorWithCode(
+			err,
+			utils.ErrorCodeNotFound,
+			"country not found",
+		)
+	}
+
+	return country, nil
 }

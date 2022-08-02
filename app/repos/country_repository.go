@@ -2,18 +2,19 @@ package repos
 
 import (
 	"context"
+	"strings"
 
 	"github.com/vonmutinda/organono/app/db"
 	"github.com/vonmutinda/organono/app/entities"
 )
 
 const (
-	getCountryByIDSQL = "SELECT id, country_code, currency, name, dialling_code FROM countries WHERE id = $1"
+	getCountryByNameSQL = "SELECT id, country_code, currency, name, dialling_code FROM countries WHERE LOWER(name) = $1"
 )
 
 type (
 	CountryRepository interface {
-		CountryByID(ctx context.Context, operations db.SQLOperations, countryID int64) (*entities.Country, error)
+		CountryByName(ctx context.Context, operations db.SQLOperations, countryName string) (*entities.Country, error)
 	}
 
 	AppCountryRepository struct{}
@@ -23,18 +24,18 @@ func NewCountryRepository() *AppCountryRepository {
 	return &AppCountryRepository{}
 }
 
-func (r *AppCountryRepository) CountryByID(
+func (r *AppCountryRepository) CountryByName(
 	ctx context.Context,
 	operations db.SQLOperations,
-	countryID int64,
+	countryName string,
 ) (*entities.Country, error) {
 
 	var country entities.Country
 
 	err := operations.QueryRowContext(
 		ctx,
-		getCountryByIDSQL,
-		countryID,
+		getCountryByNameSQL,
+		strings.ToLower(countryName),
 	).Scan(
 		&country.ID,
 		&country.CountryCode,
