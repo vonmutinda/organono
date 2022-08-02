@@ -86,10 +86,11 @@ func NewErrorWithCode(
 	genericError, ok := err.(*Error)
 	if !ok {
 		genericError = &Error{
-			err:       err,
-			errorCode: errorCode,
+			err: err,
 		}
 	}
+
+	genericError.errorCode = errorCode
 
 	genericError.addLogMessage(err, format, args...)
 

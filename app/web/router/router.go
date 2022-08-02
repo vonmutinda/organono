@@ -29,9 +29,6 @@ func BuildRouter(
 
 	router := gin.Default()
 
-	// router versions
-	appV1Router := router.Group("/v1")
-
 	sessionRepository := repos.NewSessionRepository()
 	userRepository := repos.NewUserRepository()
 	sessionAuthenticator := auth.NewSessionAuthenticator(providers.NewIPAPI(), sessionRepository, userRepository)
@@ -51,6 +48,9 @@ func BuildRouter(
 		countryRepository,
 	)
 	sessionService := services.NewSessionService(sessionRepository, userRepository)
+
+	// router versions
+	appV1Router := router.Group("/v1")
 
 	// Open endpoints
 	unauthenticatedUsers := appV1Router.Group("")

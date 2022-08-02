@@ -214,7 +214,7 @@ func TestCompanyEndpointsRepository(t *testing.T) {
 				b, err := json.Marshal(form)
 				So(err, ShouldBeNil)
 
-				ctx = ctxhelper.WithIpAddress(ctx, "176.56.168.0") // cyprus ip address
+				ctx = ctxhelper.WithIpAddress(ctx, "176.56.168.10") // cyprus ip address
 
 				req, err := http.NewRequest(http.MethodPost, "/v1/companies", bytes.NewReader(b))
 				So(err, ShouldBeNil)

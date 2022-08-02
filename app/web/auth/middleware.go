@@ -2,6 +2,9 @@ package auth
 
 import (
 	"errors"
+	"fmt"
+	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/vonmutinda/organono/app/db"
@@ -20,7 +23,7 @@ func AllowOnlyActiveUser(
 
 		ctx := c.Request.Context()
 
-		isCyprus, err := sessionAuthenticator.IsCyrpusIPAddress(ctx)
+		err := validateCyprusIPAddress(c, sessionAuthenticator)
 		if err != nil {
 			wrappedError := utils.NewError(
 				err,
@@ -34,11 +37,7 @@ func AllowOnlyActiveUser(
 			return
 		}
 
-		if isCyprus {
-			c.Next()
-		}
-
-		err = validateSession(c, dB, sessionAuthenticator, sessionService, "user")
+		err = validateSession(c, dB, sessionAuthenticator, sessionService)
 		if err != nil {
 			wrappedError := utils.NewError(
 				err,
@@ -72,12 +71,46 @@ func AllowOnlyActiveUser(
 	}
 }
 
+func validateCyprusIPAddress(
+	c *gin.Context,
+	sessionAuthenticator SessionAuthenticator,
+) error {
+
+	isCyprus, err := sessionAuthenticator.IsCyrpusIPAddress(c.Request.Context())
+	if err != nil {
+		return err
+	}
+
+	if !isCyprus {
+		return nil
+	}
+
+	exemptedMethodURLMap := map[string]string{
+		http.MethodPost:   "/v1/companies",
+		http.MethodDelete: "/v1/company/%v",
+	}
+
+	url, ok := exemptedMethodURLMap[c.Request.Method]
+	if !ok {
+		return nil
+	}
+
+	if strings.Contains(url, "%v") {
+		url = fmt.Sprintf(url, c.Param("id"))
+	}
+
+	if url == c.Request.URL.Path {
+		c.Next()
+	}
+
+	return nil
+}
+
 func validateSession(
 	c *gin.Context,
 	dB db.DB,
 	sessionAuthenticator SessionAuthenticator,
 	sessionService services.SessionService,
-	role string,
 ) error {
 
 	ctx := c.Request.Context()

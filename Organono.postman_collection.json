@@ -1,0 +1,251 @@
+{
+	"info": {
+		"_postman_id": "4ad62041-59b4-4fd7-a127-bee15cc167ff",
+		"name": "Organono",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5579942"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"xm\",\n    \"password\": \"password\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/v1/auth",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list-companies",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-ORGANONO-Token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTA5OTMzMTQsInJlZnJlc2giOjE2NTk0NjA5MTQsInNlc3Npb25faWQiOjQsInN0YXR1cyI6ImFjdGl2ZSIsInVzZXJfaWQiOjF9.K71WXavS-XTZjv0Z0FWZZAVp8ZzfYmZ1g2mrH3IOP44",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/v1/companies",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"companies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-company",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-ORGANONO-Token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTA5OTMzMTQsInJlZnJlc2giOjE2NTk0NjA5MTQsInNlc3Npb25faWQiOjQsInN0YXR1cyI6ImFjdGl2ZSIsInVzZXJfaWQiOjF9.K71WXavS-XTZjv0Z0FWZZAVp8ZzfYmZ1g2mrH3IOP44",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/v1/companies/1",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"companies",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete-company",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-ORGANONO-Token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTA5OTMzMTQsInJlZnJlc2giOjE2NTk0NjA5MTQsInNlc3Npb25faWQiOjQsInN0YXR1cyI6ImFjdGl2ZSIsInVzZXJfaWQiOjF9.K71WXavS-XTZjv0Z0FWZZAVp8ZzfYmZ1g2mrH3IOP44",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/v1/companies/2",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"companies",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create-company",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-ORGANONO-Token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTA5OTMzMTQsInJlZnJlc2giOjE2NTk0NjA5MTQsInNlc3Npb25faWQiOjQsInN0YXR1cyI6ImFjdGl2ZSIsInVzZXJfaWQiOjF9.K71WXavS-XTZjv0Z0FWZZAVp8ZzfYmZ1g2mrH3IOP44",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Boiling Point\",\n    \"code\": \"BP\",\n    \"phone\": \"35790034568\",\n    \"website\": \"https://pb.com\",\n    \"country\": \"cyprus\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/v1/companies",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"companies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update-company",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-ORGANONO-Token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTA5OTMzMTQsInJlZnJlc2giOjE2NTk0NjA5MTQsInNlc3Npb25faWQiOjQsInN0YXR1cyI6ImFjdGl2ZSIsInVzZXJfaWQiOjF9.K71WXavS-XTZjv0Z0FWZZAVp8ZzfYmZ1g2mrH3IOP44",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Trading CFDs\",\n    \"code\": \"TCF\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/v1/companies/1",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"companies",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "logout",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-ORGANONO-TOKEN",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTA5OTI0OTQsInJlZnJlc2giOjE2NTk0NjAwOTQsInNlc3Npb25faWQiOjMsInN0YXR1cyI6ImFjdGl2ZSIsInVzZXJfaWQiOjF9.3O9xeLFGvXiDxrVxaJtqSacxixyw4KECDApxkvPRjss",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/v1/auth",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"auth"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

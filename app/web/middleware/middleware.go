@@ -145,6 +145,7 @@ func setupAppContext(
 
 		tokenInfo, err := sessionAuthenticator.TokenInfoFromRequest(c.Request)
 		if err != nil {
+
 			wrappedError := utils.NewError(
 				err,
 				"Failed to parse token info from request",

@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -76,7 +75,6 @@ func (a *AppSessionAuthenticator) IsCyrpusIPAddress(
 
 	countryWithIp, err := a.ipAPIProvider.CountryForIP(lookupIPAddress)
 	if err != nil {
-		fmt.Println("error here : = ", err)
 		return false, err
 	}
 
