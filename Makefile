@@ -1,5 +1,8 @@
 include .env
 
+version = v1.0.0
+dockerpath = vonmutinda/organono
+
 populate_countries:
 	go run scripts/populate_countries.go -e .env
 
@@ -20,7 +23,7 @@ migration:
 	goose -dir app/db/migrations create $(name) sql
 
 server:
-	go run cmd/main.go -e .env
+	go run cmd/main.go
 
 hello:
 	godo hello
@@ -33,6 +36,18 @@ test-lite:
 
 up:
 	docker-compose -f docker-compose.yml up --remove-orphans
-	
+
 stop:
-	docker-compose stop
+	docker-compose down --remove-orphans
+
+build:
+	docker build -t organono . 
+	
+tag:
+	docker tag organono $(dockerpath):$(version)
+
+push:
+	docker push vonmutinda/organono:$(version)
+
+run:
+	docker run --name organono-$(version) -p ${PORT}:${PORT} organono

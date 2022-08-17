@@ -36,54 +36,54 @@ func setupLogger() Logger {
 }
 
 func Panic(msg string) {
-	Default().Panic(msg)
+	logger.Panic(msg)
 }
 
 func Panicf(format string, args ...interface{}) {
-	Default().Panicf(format, args...)
+	logger.Panicf(format, args...)
 }
 
 func Fatal(msg string) {
-	Default().Fatal(msg)
+	logger.Fatal(msg)
 }
 
 func Fatalf(format string, args ...interface{}) {
-	Default().Fatalf(format, args...)
+	logger.Fatalf(format, args...)
 }
 
 func Error(msg string) {
-	Default().Error(msg)
+	logger.Error(msg)
 }
 
 func Errorf(format string, args ...interface{}) {
-	Default().Errorf(format, args...)
+	logger.Errorf(format, args...)
 }
 
 func Warn(msg string) {
-	Default().Warn(msg)
+	logger.Warn(msg)
 }
 
 func Warnf(format string, args ...interface{}) {
-	Default().Warnf(format, args...)
+	logger.Warnf(format, args...)
 }
 
 func Info(msg string) {
-	Default().Info(msg)
+	logger.Info(msg)
 }
 
 func Infof(format string, args ...interface{}) {
-	Default().Infof(format, args...)
+	logger.Infof(format, args...)
 }
 
 func Debug(msg string) {
-	Default().Debug(msg)
+	logger.Debug(msg)
 }
 
 func Debugf(format string, args ...interface{}) {
-	Default().Debugf(format, args...)
+	logger.Debugf(format, args...)
 }
 
 func Flush() error {
-	Default().Flush()
+	logger.Flush()
 	return nil
 }

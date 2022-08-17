@@ -12,7 +12,7 @@ require (
 	github.com/nyaruka/phonenumbers v1.1.0
 	github.com/smartystreets/goconvey v1.7.2
 	go.uber.org/zap v1.21.0
-	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
+	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
 	gopkg.in/godo.v2 v2.0.9
 	gopkg.in/guregu/null.v3 v3.5.0
 	syreclabs.com/go/faker v1.2.3
@@ -45,9 +45,9 @@ require (
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4 // indirect
-	golang.org/x/sys v0.0.0-20210927094055-39ccf1dd6fa6 // indirect
-	golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1 // indirect
+	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
+	golang.org/x/sys v0.0.0-20220731174439-a90be440212d // indirect
+	golang.org/x/term v0.0.0-20220722155259-a9ba230a4035 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/stretchr/testify.v1 v1.2.2 // indirect
