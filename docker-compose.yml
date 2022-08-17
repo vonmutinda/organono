@@ -24,8 +24,16 @@ services:
       - RABBITMQ_DEFAULT_VHOST=organono_backend
       - RABBITMQ_ERLANG_COOKIE=QAHpw0kjARdWvwp
 
-  redis:
-    image: redis:5.0
+  organono-api:
+    image: vonmutinda/organono:v1.0.0
     ports:
-      - 6380:6379
-    command: redis-server --requirepass pass1234
+      - 8080:8080
+    depends_on:
+      - postgres
+    volumes:
+      - ~/apps/organono:/var/log/organono-api  
+    environment:
+      - DATABASE_URL=postgres://admin:password@${DOCKER_GATEWAY_HOST:-host.docker.internal}:5433/organono_backend?sslmode=disable
+      - ENVIRONMENT=development
+      - LOG_FILE=/var/log/organono-api/organono.log
+      - PORT=8080
