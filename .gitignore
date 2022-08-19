@@ -2,3 +2,5 @@ godobin*
 .env
 .env.test
 organono
+rds_params.json
+organono-api-deployment.yml

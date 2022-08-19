@@ -1,0 +1,10 @@
+[
+   {
+     "ParameterKey": "EnvironmentName",
+    "ParameterValue": "Organono"
+   },
+   {
+    "ParameterKey": "DBPassword",
+    "ParameterValue": "password"
+   }
+]

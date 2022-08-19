@@ -1,0 +1,67 @@
+Parameters:
+  EnvironmentName:
+    Description: Project Name prefixed to our resource names
+    Type: String
+
+  EnvironmentType:
+    Description: "Specify the Environment type of the stack."
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - stage
+      - prod
+
+  DBUsername:
+    NoEcho: "true"
+    Description: RDS Postgres Username
+    Type: String
+    MinLength: "1"
+    MaxLength: "16"
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+    ConstraintDescription: Must begin with a letter and contain only alphanumeric characters.
+    Default: "postgres"
+
+  DBPassword:
+    NoEcho: "true"
+    Description: RDS Postgres Password
+    Type: String
+    MinLength: "8"
+    MaxLength: "41"
+    AllowedPattern: "[a-zA-Z0-9]*"
+    ConstraintDescription: Must contain only alphanumeric characters.
+
+Resources:
+  DBEC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Join ["-", [webapp-db-security-group, !Ref EnvironmentType]]
+      GroupDescription: Allow Postgres Inbound Traffic
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Join ["-", [webapp-db-security-group, !Ref EnvironmentType]]
+
+  WebAppDatabase:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: !Sub ${EnvironmentName}-${EnvironmentType}-db
+      VPCSecurityGroups:
+        - !GetAtt DBEC2SecurityGroup.GroupId
+      AllocatedStorage: "5"
+      DBInstanceClass: db.t3.micro
+      Engine: postgres
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      Tags:
+        - Key: Name
+          Value: !Join ["-", [organono-rds, !Ref EnvironmentType]]
+
+Outputs:
+  WebAppDatabase:
+    Description: Our RDS Database URL
+    Value: !GetAtt WebAppDatabase.Endpoint.Address

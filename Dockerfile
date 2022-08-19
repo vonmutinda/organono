@@ -12,14 +12,12 @@ RUN \
 # run
 FROM docker.io/alpine:3.14
 
-WORKDIR /app
-
 RUN \
     apk update
 
 COPY \
-    --from=builder /app/organono-api /app/.env /app/
+    --from=builder /app/organono-api /usr/bin/
 
 EXPOSE 80
 
-ENTRYPOINT ["./organono-api"]
+CMD ["organono-api"]

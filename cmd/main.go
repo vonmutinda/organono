@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -22,9 +23,16 @@ func main() {
 	logger.Initialize()
 	defer logger.Flush()
 
-	err := godotenv.Load(".env")
-	if err != nil {
-		logger.Fatalf("Failed to load env file err = %v", err)
+	var envFilePath string
+
+	flag.StringVar(&envFilePath, "e", "", "Path to .env file")
+	flag.Parse()
+
+	if envFilePath != "" {
+		err := godotenv.Load(envFilePath)
+		if err != nil {
+			logger.Fatalf("Failed to load env file err = %v", err)
+		}
 	}
 
 	logger.Infof("ENVIRONMENT=[%v]", os.Getenv("ENVIRONMENT"))
@@ -62,7 +70,7 @@ func main() {
 
 	logger.Infof("Server starting... Listening on port :%v", port)
 
-	err = server.ListenAndServe()
+	err := server.ListenAndServe()
 	if err != nil {
 		switch err {
 		case http.ErrServerClosed:

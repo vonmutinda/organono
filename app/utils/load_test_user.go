@@ -26,7 +26,7 @@ var (
 		`
 )
 
-func LoadTestData(dB db.SQLOperations) error {
+func LoadTestData(dB db.DB) error {
 
 	hash, err := GeneratePasswordHash(defaultPassword)
 	if err != nil {
