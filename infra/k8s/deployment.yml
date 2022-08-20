@@ -1,0 +1,43 @@
+---
+#----------------------------------
+# Cluster Service - Deployed Service Registry Name
+#----------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-organono-api
+spec:
+  selector:
+    app: app-organono-api
+  ports:
+    - port: 8080
+
+---
+#----------------------------------
+# ImageBuilds / Replica / VersionLabels
+#----------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-organono-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-organono-api
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: app-organono-api
+        version: v1
+    spec:
+      containers:
+        - name: organono-api
+          image: vonmutinda/organono:v1.0.0
+          ports:
+            - containerPort: 80
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: cm-organono-api

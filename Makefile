@@ -64,11 +64,17 @@ create-cluster:
 delete-cluster:
 	eksctl delete cluster --name organono-cluster --region=us-east-1 --profile=default
 
+configmap:
+	kubectl create -f ./infra/k8s/configmap.yml
+
 deploy:
-	kubectl apply -f ./infra/pods/organono-api-deployment.yml
+	kubectl apply -f ./infra/k8s/deployment.yml
 
 cluster-status:
 	kubectl get deploy,rs,svc,pods
+
+delete-deployment:
+	kubectl delete deployment.apps/deployment-organono-api
 
 printenv:
 	kubectl exec organono-api -- printenv
@@ -77,4 +83,4 @@ logs:
 	kubectl logs pod/organono-api
 
 port-forward:
-	kubectl port-forward pod/organono-api ${PORT}:80
+	kubectl port-forward deployment.apps/deployment-organono-api ${PORT}:80

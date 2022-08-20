@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-organono-api
+  labels:
+    app: app-organono-api
+    version: v1
+data:
+  APP_NAME: "vonmutinda/organono-api"
+  ENVIRONEMENT: "development"
+  DATABASE_URL: "postgres://postgres:password@<rds-database-url>5432/postgres"
+  KEY_NAME: "VALUE"
+  PORT: "80"
