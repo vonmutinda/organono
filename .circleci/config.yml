@@ -35,8 +35,7 @@ jobs:
         user: root
     working_directory: ~/app
     steps:
-      - checkout
-      - install-hadolint
+      - checkout 
       - run:
           name: Scan Dockerfile
           command: hadolint Dockerfile
@@ -57,6 +56,7 @@ jobs:
   scan:
     docker:
       - image: cimg/base:stable
+        user: root
     steps:
       - checkout
       - install-hadolint
@@ -67,7 +67,7 @@ jobs:
 
   tests:
     docker:
-      - image: docker.io/golang:1.18-alpine
+      - image: cimg/go:1.16
       - image: cimg/postgres:14.0
         auth:
           username: admin
@@ -75,6 +75,7 @@ jobs:
         environment:
           POSTGRES_USER: admin
           POSTGRES_DB: organono_backend
+    parallelism: 2
     steps:
       - checkout
       - attach_workspace:
