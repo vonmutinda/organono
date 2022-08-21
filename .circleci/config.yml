@@ -69,7 +69,7 @@ jobs:
         environment:
           POSTGRES_USER: admin
           POSTGRES_DB: organono_backend
-    parallelism: 2
+    # parallelism: 2
     steps:
       - checkout
       - attach_workspace:
