@@ -35,10 +35,7 @@ jobs:
         user: root
     working_directory: ~/app
     steps:
-      - checkout 
-      - run:
-          name: Scan Dockerfile
-          command: hadolint Dockerfile
+      - checkout
       - run:
           name: Install Dependencies
           command: |
@@ -69,9 +66,6 @@ jobs:
     docker:
       - image: cimg/go:1.16
       - image: cimg/postgres:14.0
-        auth:
-          username: admin
-          password: password
         environment:
           POSTGRES_USER: admin
           POSTGRES_DB: organono_backend
