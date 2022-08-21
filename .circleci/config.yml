@@ -75,7 +75,10 @@ jobs:
       - attach_workspace:
           at: ~/
       - run-migrations:
-          DatabaseURL: postgres://admin:password@localhost:5432/organono_backend
+          DatabaseURL: postgres://admin:password@localhost:5432/organono_backend?sslmode=disable
+      - run:
+          name: Waiting for Postgres to be ready
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run:
           name: Run Test Suites
           command: |
