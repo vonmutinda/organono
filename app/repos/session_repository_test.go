@@ -49,11 +49,11 @@ func TestSessionRepository(t *testing.T) {
 			So(foundSession.ID, ShouldEqual, session.ID)
 			So(foundSession.IPAddress, ShouldEqual, session.IPAddress)
 			So(foundSession.UserAgent, ShouldEqual, session.UserAgent)
-			So(foundSession.LastRefreshedAt, ShouldEqual, session.LastRefreshedAt)
+			So(foundSession.LastRefreshedAt.Truncate(time.Second), ShouldEqual, session.LastRefreshedAt.Truncate(time.Second))
 			So(foundSession.DeactivatedAt.Valid, ShouldBeFalse)
 			So(foundSession.UserID, ShouldEqual, session.UserID)
-			So(foundSession.CreatedAt, ShouldEqual, session.CreatedAt)
-			So(foundSession.UpdatedAt, ShouldEqual, session.UpdatedAt)
+			So(foundSession.CreatedAt.Truncate(time.Second), ShouldEqual, session.CreatedAt.Truncate(time.Second))
+			So(foundSession.UpdatedAt.Truncate(time.Second), ShouldEqual, session.UpdatedAt.Truncate(time.Second))
 		})
 
 		Convey("can update a session", func() {
