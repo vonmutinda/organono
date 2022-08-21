@@ -64,7 +64,7 @@ jobs:
 
   tests:
     docker:
-      - image: cimg/go:1.16
+      - image: docker.io/golang:1.18-alpine
       - image: cimg/postgres:14.0
         environment:
           POSTGRES_USER: admin
