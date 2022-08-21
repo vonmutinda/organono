@@ -3,6 +3,7 @@ package repos
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/vonmutinda/organono/app/db"
 	"github.com/vonmutinda/organono/app/entities"
@@ -45,9 +46,9 @@ func TestUserRepository(t *testing.T) {
 			So(foundUser.LastName, ShouldEqual, user.LastName)
 			So(foundUser.Username, ShouldEqual, user.Username)
 			So(foundUser.Status, ShouldEqual, user.Status)
-			So(foundUser.CreatedAt, ShouldEqual, user.CreatedAt)
-			So(foundUser.UpdatedAt, ShouldEqual, user.UpdatedAt)
-			So(foundUser.PasswordHash, ShouldEqual, user.PasswordHash)
+			So(foundUser.PasswordHash, ShouldEqual, user.PasswordHash) 
+			So(foundUser.CreatedAt.Truncate(time.Second), ShouldEqual, user.CreatedAt.Truncate(time.Second))
+			So(foundUser.UpdatedAt.Truncate(time.Second), ShouldEqual, user.UpdatedAt.Truncate(time.Second))
 		})
 
 		Convey("can update a user", func() {

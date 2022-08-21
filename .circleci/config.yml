@@ -77,10 +77,6 @@ jobs:
       - run-migrations:
           DatabaseURL: postgres://admin:password@localhost:5432/organono_backend?sslmode=disable
       - run:
-          name: Populate Countries
-          command: |
-            go run scripts/populate_countries.go
-      - run:
           name: Run Test Suites
           command: |
             go test ./...
