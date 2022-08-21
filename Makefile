@@ -64,6 +64,10 @@ create-cluster:
 delete-cluster:
 	eksctl delete cluster --name organono-cluster --region=us-east-1 --profile=default
 
+set-cluster:
+	kubectl config set-cluster test-cluster --server=http://<master-ip> --api-version=v1
+	kubectl config use-context test-cluster
+
 configmap:
 	kubectl create -f ./infra/k8s/configmap.yml
 
@@ -84,3 +88,10 @@ logs:
 
 port-forward:
 	kubectl port-forward deployment.apps/deployment-organono-api ${PORT}:80
+
+k8s-admin:
+	kubectl apply -f ./infra/k8s/admin-dashboard.yml
+
+admin-token:
+	kubectl -n kubernetes-dashboard create token admin-user
+	kubectl proxy

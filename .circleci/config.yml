@@ -1,0 +1,134 @@
+version: 2.1
+
+orbs: 
+  kubernetes: circleci/kubernetes@1.3.1
+
+commands:
+  install-hadolint:
+    description: Install Hadolint
+    steps:
+      - run:
+          name: Install Hadolint
+          command: |
+            wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.10.0/hadolint-Linux-x86_64 && \
+            chmod +x /bin/hadolint
+
+jobs:
+  build:
+    docker:
+      - image: golang:1.18-alpine
+        user: root
+    working_directory: ~/app
+    steps:
+      - checkout
+      - install-hadolint
+      - run:
+          name: Scan Dockerfile
+          command: hadolint Dockerfile
+      - run:
+          name: Install Dependencies
+          command: |
+            go mod download
+      - run:
+          name: Build Binary
+          command: |
+            go fmt ./...
+            CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o organono-api cmd/main.go
+      - save_cache:
+          paths:
+            - organono-api
+          key: organono-api-binary
+  
+  scan:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install-hadolint
+      - run:
+          name: Scan Dockerfile
+          command: |
+            hadolint Dockerfile 
+
+  tests:
+    docker:
+      - image: golang:1.18-alpine 
+      - image: cimg/postgres:14.0
+        auth:
+          username: admin
+          password: password
+        environment:
+          POSTGRES_USER: admin
+          POSTGRES_DB: organono_backend
+    steps:
+      - checkout 
+      - attach_workspace:
+          at: ~/ 
+      - run:
+          name: Populate Countries
+          command: |
+            go run scripts/populate_countries.go
+      - run:
+          name: Run Test Suites
+          command: |
+            go test ./...
+          environment:
+            DATABASE_URL: postgres://admin:password@localhost:5432/organono_backend?sslmode=disable
+
+  infra-setup:
+    docker:
+      - image: cimg/base:stable 
+    steps:
+      - checkout
+      - kubernetes/install-kubectl
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Configure Cluster
+          command: |
+            kubectl config set-cluster $CLUSTER_NAME --server=$K8S_CLUSTER_URL
+      - run:
+          name: Get Cluster Nodes
+          command: |
+            kubectl get nodes
+  
+  deploy:
+    docker:
+      - image: cimg/base:stable 
+    steps:
+      - checkout
+      - run:  
+          name: Build Image and Publish to Docker.io
+          command: |
+            docker build -t organono-api . 
+            docker tag organono-api vonmutinda/organono-api:v1.0.0 # refactor to use ${CIRCLE_SHA1} as tag version
+            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+            docker push organono-api
+      - run:
+          name: Deploy Image to Cluster
+          command: |
+            kubectl apply -f infra/k8s/configmap.yml
+            kubectl apply -f infra/k8s/deployment.yml
+
+    smoke-test:
+      docker:
+        - image: cimg/base:stable
+      steps:
+        - checkout
+        - run:
+            name: Confirm Running Node
+            command: |
+              make cluster-status
+
+workflows:
+  devops:
+    jobs:
+      - build
+      - scan
+      - tests
+      - infra-setup:
+          requires: [build, scan, tests]
+      - deploy:
+          requires: [infra-setup]
+      - smoke-test:
+          requires: [deploy]
