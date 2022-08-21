@@ -75,7 +75,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run-migrations:
-          DatabaseURL: postgres://admin:password@localhost:5432/organono_backend?sslmode=disable
+          DatabaseURL: postgres://admin:password@localhost:5432/organono_backend
       - run:
           name: Run Test Suites
           command: |
