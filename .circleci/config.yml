@@ -26,7 +26,7 @@ commands:
       - run:
           name: Run Migrations
           command: |
-            goose -dir 'app/db/migrations' postgres <<pipeline.DatabaseURL>> up
+            goose -dir 'app/db/migrations' postgres <<parameters.DatabaseURL>> up
 
 jobs:
   build:
