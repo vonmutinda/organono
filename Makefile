@@ -59,14 +59,14 @@ delete-rds:
 	aws cloudformation delete-stack --stack-name organono-rds --region=us-east-1 --profile=default
 
 create-cluster:
-	eksctl create cluster --name organono-cluster --region=us-east-1 --nodes=2 --profile=default
+	eksctl create cluster --name organono --region=us-east-1 --nodes=2 --profile=default
 
 delete-cluster:
-	eksctl delete cluster --name organono-cluster --region=us-east-1 --profile=default
+	eksctl delete cluster --name organono --region=us-east-1 --profile=default
 
 set-cluster:
-	kubectl config set-cluster test-cluster --server=http://<master-ip> --api-version=v1
-	kubectl config use-context test-cluster
+	kubectl config set-cluster organono-cluster --server=<master-ip> --api-version=v1
+	kubectl config use-context organono-cluster
 
 configmap:
 	kubectl create -f ./infra/k8s/configmap.yml
